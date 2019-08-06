@@ -1,0 +1,26 @@
+﻿@using BugTracker.ViewModels;
+@using BugTracker.Helpers;
+
+@model IEnumerable<UserProfileViewModel>
+
+@{ 
+    var projectHelper = new  ProjectsHelper();
+}
+
+<h2>Individual user project management</h2>
+
+@using (Html.BeginForm("ManageUserProjects", "Admin", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    <div class="row">
+        @Html.Label("Assign Project", null,htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.ListBox("Projects", null, "--Select Project--")
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="submit" value="Assign" class="btn btn-default" />
+        </div>
+    </div>
+}

@@ -1,0 +1,28 @@
+﻿@using BugTracker.ViewModels;
+@using BugTracker.Models;
+
+@model IEnumerable<UserProfileViewModel>
+
+
+<h2>Individual user role management</h2>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    @Html.Hidden("UserId", (string)ViewBag.UserId)
+
+    <div class="row">        
+            @Html.Label("Assign Role", null, htmlAttributes: new { @class = "control-label col-md-2" })        
+        <div class="col-md-10">
+            @Html.DropDownList("UserRole", null, "--Select Role--", htmlAttributes: new { @class = "form-control" })
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="submit" value="Assign" class="btn btn-default" />
+        </div>
+    </div>
+}
+
+
+

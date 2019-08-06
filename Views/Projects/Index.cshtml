@@ -1,0 +1,107 @@
+﻿@using BugTracker.ViewModels
+@using BugTracker.Helpers
+
+@model IEnumerable<BugTracker.Models.Project>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box">
+                <div class="box-header">
+                    <h2 class="box-title">Projects</h2>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <table id="userTable" class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>@Html.DisplayNameFor(model => model.Name)</th>
+                                <th>@Html.DisplayNameFor(model => model.Description)</th>
+                                <th> @Html.DisplayNameFor(model => model.Created)</th>
+                                <th>@Html.DisplayName("Project Manager")</th>
+                                <th>@Html.DisplayName("Developer(s)")</th>
+                                <th>@Html.DisplayName("Submitter(s)")</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                    var projectHelper = new ProjectsHelper();
+                            <tr>
+                                <td>@Html.DisplayFor(modelItem => item.Name)</td>
+                                <td>@Html.DisplayFor(modelItem => item.Description)</td>
+                                <td>@Html.DisplayFor(modelItem => item.Created)</td>
+                                <td>
+                                    @foreach (var user in projectHelper.UsersOnProjectByRole(item.Id, "Project Manager"))
+                                    {
+                                        @user.Id
+                                    }
+
+                                </td>
+                                <td>
+                                    @foreach (var user in projectHelper.UsersOnProjectByRole(item.Id, "Developer"))
+                                    {
+                                        @user.Id
+                                    }
+                                </td>
+                                <td>
+                                    @foreach (var user in projectHelper.UsersOnProjectByRole(item.Id, "Submitter"))
+                                    {
+                                        @user.Id
+                                    }
+                                </td>
+                                <td>
+                                    @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
+                                    @Html.ActionLink("Details", "Details", new { id = item.Id }) |
+                                </td>
+                            </tr>
+                            }
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th>@Html.DisplayNameFor(model => model.Name)</th>
+                                <th>@Html.DisplayNameFor(model => model.Description)</th>
+                                <th> @Html.DisplayNameFor(model => model.Created)</th>
+                                <th>@Html.DisplayName("Project Manager")</th>
+                                <th>@Html.DisplayName("Developer(s)")</th>
+                                <th>@Html.DisplayName("Submitter(s)")</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                <!-- /.box-body -->
+            </div>
+            <!-- /.box-->
+        </div>
+        <!-- /.col-->
+    </div>
+    <!-- /.row -->
+</section>
+<!-- /.content -->
+
+
+@section scripts{
+
+    <script>
+    $('#userTable').DataTable({
+            'paging': true,
+            "lengthMenu": [ [10, 25, 50, 100, -1], [10, 25, 50, 100, "All"] ],
+            'searching': true,
+            'ordering': true,
+            'info': true,
+            'autoWidth': true
+        });
+    </script>
+}
+
+
+
