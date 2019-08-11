@@ -16,6 +16,7 @@ namespace BugTracker.Controllers
     {
         private ApplicationDbContext db = new ApplicationDbContext();
         private UserRolesHelper roleHelper = new UserRolesHelper();
+        private ProjectsHelper projectHelper = new ProjectsHelper();
 
         [Authorize]
         // GET: Tickets
@@ -72,11 +73,11 @@ namespace BugTracker.Controllers
         // GET: Tickets/Create
         public ActionResult Create()
         {
-            ViewBag.AssignedToUserId = new SelectList(db.Users, "Id", "FirstName");
-            ViewBag.OwnerId = new SelectList(db.Users, "Id", "FirstName");
+            var userId = User.Identity.GetUserId();
+            var myProjects = projectHelper.ListUserProjects(User.Identity.GetUserId());
+
             ViewBag.ProjectId = new SelectList(db.Projects, "Id", "Name");
             ViewBag.TicketPriorityId = new SelectList(db.TicketPriorities, "Id", "Name");
-            ViewBag.TicketStatusId = new SelectList(db.TicketStatuses, "Id", "Name");
             ViewBag.TicketTypeId = new SelectList(db.TicketTypes, "Id", "Name");
             return View();
         }
@@ -86,25 +87,30 @@ namespace BugTracker.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "Id,ProjectId,TicketTypeId,TicketPriorityId,TicketStatusId,Title,Description,Created,Updated,OwnerId,AssignedToUserId,Deleted")] Ticket ticket)
+        [Authorize(Roles = "Submitter")]
+        public ActionResult Create([Bind(Include = "ProjectId,TicketTypeId,TicketPriorityId,Title,Description")] Ticket ticket)
         {
             if (ModelState.IsValid)
             {
+                  
+
+                ticket.TicketStatusId = db.TicketStatuses.FirstOrDefault(t => t.Name == "New/Unassigned").Id;
+                ticket.OwnerId = User.Identity.GetUserId();
+                ticket.Created = DateTime.Now;
                 db.Tickets.Add(ticket);
                 db.SaveChanges();
-                return RedirectToAction("Index");
+                return RedirectToAction("Details", "Tickets", new { id = ticket.Id });
             }
 
-            ViewBag.AssignedToUserId = new SelectList(db.Users, "Id", "FirstName", ticket.AssignedToUserId);
-            ViewBag.OwnerId = new SelectList(db.Users, "Id", "FirstName", ticket.OwnerId);
+           
             ViewBag.ProjectId = new SelectList(db.Projects, "Id", "Name", ticket.ProjectId);
             ViewBag.TicketPriorityId = new SelectList(db.TicketPriorities, "Id", "Name", ticket.TicketPriorityId);
-            ViewBag.TicketStatusId = new SelectList(db.TicketStatuses, "Id", "Name", ticket.TicketStatusId);
             ViewBag.TicketTypeId = new SelectList(db.TicketTypes, "Id", "Name", ticket.TicketTypeId);
             return View(ticket);
         }
 
         // GET: Tickets/Edit/5
+        [Authorize(Roles = "Admin, Project Manager, Submitter, Developer")]
         public ActionResult Edit(int? id)
         {
             if (id == null)
@@ -112,17 +118,41 @@ namespace BugTracker.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
             Ticket ticket = db.Tickets.Find(id);
+
             if (ticket == null)
             {
                 return HttpNotFound();
             }
-            ViewBag.AssignedToUserId = new SelectList(db.Users, "Id", "FirstName", ticket.AssignedToUserId);
-            ViewBag.OwnerId = new SelectList(db.Users, "Id", "FirstName", ticket.OwnerId);
+
+            var allowed = false;
+            var userId = User.Identity.GetUserId();
+
+            if (User.IsInRole("Developer") && ticket.AssignedToUserId == userId)
+                allowed = true;
+            else if (User.IsInRole("Submitter") && ticket.OwnerId == userId)
+                allowed = true;
+            else if (User.IsInRole("Project Manager"))
+            {
+                //if(db.Users.Find(userId).Projects.SelectMany(p => p.Tickets).Select(t => new { id = t.Id}).Contains(ticket.Id));
+               //if this ticket is on a project I am on, then I can edit this ticket
+            }
+            else
+            {
+                allowed = true;
+            }
+            if(allowed)
+            {
+            ViewBag.AssignedToUserId = new SelectList(db.Users, "Id", "FirstName", ticket.AssignedToUserId);   
             ViewBag.ProjectId = new SelectList(db.Projects, "Id", "Name", ticket.ProjectId);
             ViewBag.TicketPriorityId = new SelectList(db.TicketPriorities, "Id", "Name", ticket.TicketPriorityId);
             ViewBag.TicketStatusId = new SelectList(db.TicketStatuses, "Id", "Name", ticket.TicketStatusId);
             ViewBag.TicketTypeId = new SelectList(db.TicketTypes, "Id", "Name", ticket.TicketTypeId);
             return View(ticket);
+            }
+            else
+            {
+                return RedirectToAction("AccessViolation, Admin");
+            }
         }
 
         // POST: Tickets/Edit/5
@@ -134,9 +164,10 @@ namespace BugTracker.Controllers
         {
             if (ModelState.IsValid)
             {
+                ticket.Updated = DateTime.Now;
                 db.Entry(ticket).State = EntityState.Modified;
                 db.SaveChanges();
-                return RedirectToAction("Index");
+                return RedirectToAction("Details", "Tickets", new { id = ticket.Id });
             }
             ViewBag.AssignedToUserId = new SelectList(db.Users, "Id", "FirstName", ticket.AssignedToUserId);
             ViewBag.OwnerId = new SelectList(db.Users, "Id", "FirstName", ticket.OwnerId);
@@ -180,6 +211,17 @@ namespace BugTracker.Controllers
                 db.Dispose();
             }
             base.Dispose(disposing);
+        }
+
+        public ActionResult Dashboard(int id)
+        {
+            var ticket = db.Tickets.Find(id);
+
+            if(ticket == null)
+            {
+                return HttpNotFound();
+            }
+            return View(ticket);
         }
     }
 }

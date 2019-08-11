@@ -1,12 +1,15 @@
 ﻿
+
 @model BugTracker.Models.Project
 
 @using BugTracker.Helpers;
+@using BugTracker.Models;
 
 
 @{
     ViewBag.Title = "Details";
     var userProjectsHelper = new ProjectsHelper();
+    var roleHelper = new UserRolesHelper();
 }
 
 
@@ -46,40 +49,70 @@
 
     </dl>
 </div>
-<p>
-    @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
-    @Html.ActionLink("Back to List", "Index")
-</p>
 
-@using (Html.BeginForm("ManageProjectUsers", "Admin", FormMethod.Post))
-{
-    @Html.AntiForgeryToken()
-    @Html.Hidden("ProjectId", Model.Id)
-    <div class="row">
-        <div class="col-md-4 text-center">
-            <h2>Project Manager</h2>
-            @Html.ListBox("ProjectManagers")
-        </div>
-        <div class="col-md-4 text-center">
-            <h2>Developers</h2>
-            @Html.ListBox("Developers")
-        </div>
-        <div class="col-md-4 text-center">
-            <h2>Submitters</h2>
-            @Html.ListBox("Submitters")
-        </div>
-    </div>
-    <br />
 
-    <div class="form-group">
-        <div class="col-md-offset-6 col-md-6">
-            <input type="submit" value="Assign" class="btn btn-default" />
-        </div>
-    </div>
-}
 
-    @foreach (var user in userProjectsHelper.UsersOnProject(Model.Id).ToList())
-    {
-        @user.FirstName @:| @Html.ActionLink("Remove", "RemoveProjectUser", "Admin", new { userId = user.Id, projectId = Model.Id }, null)
-    }
+
+
+
 <link href="~/Content/Custom.css" rel="stylesheet" />
+
+
+
+
+<!-- /.box-header -->
+<div class="box-body">
+    <table id="userTable3" class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Created</th>
+                <th>Tickets</th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                @foreach (var pUser in userProjectsHelper.UsersOnProject(Model.Id).ToList())
+                {
+                 <td>
+                    @pUser.FullName (@foreach (var role in roleHelper.ListUserRoles(pUser.Id)) {@role})<br />           
+                 </td>
+                 }
+                    @if (User.IsInRole("Admin"))
+                    {
+                        using (Html.BeginForm("ManageProjectUsers", "Admin", FormMethod.Post))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.Hidden("ProjectId", Model.Id)
+                            <td>  @Html.ListBox("ProjectManagers")</td>
+                            <td>@Html.ListBox("Developers")</td>
+                            <td>@Html.ListBox("Submitters")</td>
+                            <td>
+                                <input type="submit" value="Assign" class="btn btn-default" />
+                                @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
+                            </td>
+                            <td>
+                                @foreach (var user in userProjectsHelper.UsersOnProject(Model.Id).ToList())
+                                {
+                                    @user.FirstName @:| @Html.ActionLink("Remove", "RemoveProjectUser", "Admin", new { userId = user.Id, projectId = Model.Id }, null)
+                                }
+                            </td>
+                        }
+                    }
+                </tr>
+
+            </tbody>
+    </table>
+    <div class="col">
+        @Html.ActionLink("Back to List", "Index")
+    </div>
+</div>
+<!-- /.box-body -->

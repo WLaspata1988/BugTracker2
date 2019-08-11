@@ -23,7 +23,7 @@ namespace BugTracker.Models
         {
             get
             {
-                return $"{1},{0}";
+                return $"{FirstName}  {LastName}";
             }
         }
         //nav

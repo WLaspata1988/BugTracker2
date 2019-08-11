@@ -1762,10 +1762,11 @@ a:focus {
   clear: both;
 }
 .box-header {
-  color: #444;
+  color: black
   display: block;
   padding: 10px;
   position: relative;
+  background-color:lightgray;
 }
 .box-header.with-border {
   border-bottom: 1px solid #f4f4f4;
@@ -1816,11 +1817,9 @@ a:focus {
   box-shadow: none;
 }
 .box-body {
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 3px;
-  border-bottom-left-radius: 3px;
-  padding: 10px;
+    padding: 10px;
+    border-color: lightgray;
+    border: 2px;
 }
 .no-header .box-body {
   border-top-right-radius: 3px;
@@ -2505,10 +2504,12 @@ a:focus {
 }
 /* NAV TABS */
 .nav-tabs-custom {
-  margin-bottom: 20px;
-  background: #fff;
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
-  border-radius: 3px;
+    margin-bottom: 20px;
+    background: #fff;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+    border-radius: 3px;
+    border-color: black;
+    border: 5px solid;
 }
 .nav-tabs-custom > .nav-tabs {
   margin: 0;

@@ -1,4 +1,20 @@
-﻿ <!-- Main content -->
+﻿@using BugTracker.Helpers;
+@using Microsoft.AspNet.Identity;
+@using BugTracker.Models;
+
+
+@{
+    var ticketHelper = new TicketsHelper();
+    var userId = User.Identity.GetUserId();
+    var db = new ApplicationDbContext();
+    var user = db.Users.Find(userId);
+    var roleHelper = new UserRolesHelper();
+    var projectHelper = new ProjectsHelper();
+}
+<link href="~/Content/Custom.css" rel="stylesheet" />
+
+
+<!-- Main content -->
 <section class="content">
     <!-- Small boxes (Stat box) -->
     <div class="row">
@@ -72,14 +88,73 @@
             <div class="nav-tabs-custom">
                 <!-- Tabs within a box -->
                 <ul class="nav nav-tabs pull-right">
-                    <li class="active"><a href="#revenue-chart" data-toggle="tab">Area</a></li>
-                    <li><a href="#sales-chart" data-toggle="tab">Donut</a></li>
+                    <!-- /.content -->
+                    <li class="active"><a href="#myProjects" data-toggle="tab">Area</a></li>
+                    <li><a href="#allProjects" data-toggle="tab">Donut</a></li>
                     <li class="pull-left header"><i class="fa fa-inbox"></i> Sales</li>
                 </ul>
                 <div class="tab-content no-padding">
                     <!-- Morris chart - Sales -->
-                    <div class="chart tab-pane active" id="revenue-chart" style="position: relative; height: 300px;"></div>
-                    <div class="chart tab-pane" id="sales-chart" style="position: relative; height: 300px;"></div>
+                    <div class="tab-pane active" id="myProjects" style="position: relative; height: 300px;">
+                        <div class="content" id="content">
+                            <div class="container-fluid">
+                                <div class="panel-heading">
+                                    <div class="box-header">
+                                        <h3 class="box-title">Projects</h3>
+                                    </div>
+                                    <!-- /.box-header -->
+                                    <div class="box-body">
+                                        <table id="userTable2" class="table table-bordered table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>@Html.DisplayName("Name")</th>
+                                                    <th>@Html.DisplayName("Description")</th>
+                                                    <th>@Html.DisplayName("Created")</th>
+                                                    <th>@Html.DisplayName("Project Manager")</th>
+                                                    <th>@Html.DisplayName("Developer(s)")</th>
+                                                    <th>@Html.DisplayName("Submitter(s)")</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var item in user.Projects.ToList())
+                                                {
+                                                    <tr>
+                                                        <td>
+                                                            <a href="@Url.Action("Details", "Projects", new { Id = item.Id })">@Html.DisplayFor(modelItem => item.Name)</a>
+                                                        </td>
+                                                        <td>@Html.DisplayFor(modelItem => item.Description)</td>
+                                                        <td>@Html.DisplayFor(modelItem => item.Created)</td>
+                                                        <td>
+                                                            @foreach (var pUser in projectHelper.UsersOnProjectByRole(item.Id, "Project Manager"))
+                                                            {
+                                                                @pUser.FullName
+                                                            }
+                                                        </td>
+                                                        <td>
+                                                            @foreach (var pUser in projectHelper.UsersOnProjectByRole(item.Id, "Developer"))
+                                                            {
+                                                                @pUser.FullName
+                                                            }
+                                                        </td>
+                                                        <td>
+                                                            @foreach (var pUser in projectHelper.UsersOnProjectByRole(item.Id, "Submitter"))
+                                                            {
+                                                                @pUser.FullName
+                                                            }
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <!-- /.box-body -->
+                                </div>
+                                <!-- /.box-->
+                            </div>
+                            <!-- /.col-->
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="allProjects" style="position: relative; height: 300px;"></div>
                 </div>
             </div>
             <!-- /.nav-tabs-custom -->
@@ -507,4 +582,3 @@
     <!-- /.row (main row) -->
 
 </section>
-<!-- /.content -->

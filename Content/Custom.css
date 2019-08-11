@@ -5,3 +5,33 @@ select[size] {
     text-align:center;
     position:center;
 }
+
+.panel-heading {
+    padding: 0px 0px;
+    border: 5px solid transparent;
+    border-color: #0000008a;
+
+}
+
+.container-fluid {
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
+    margin-top: 30px;
+}
+.pagination > .active > a, .pagination > .active > span, .pagination > .active > a:hover, .pagination > .active > span:hover, .pagination > .active > a:focus, .pagination > .active > span:focus {
+    z-index: 3;
+    color: #fff;
+    cursor: default;
+    background-color: #009bff;
+    border-color: #009bff;
+}
+
+.body {
+    border-color:lightgray;
+}
+
+.label {
+    margin-top: 10px;
+}

@@ -36,13 +36,6 @@ namespace BugTracker.Helpers
             return (flag);
         }
 
-        public ICollection<Project>ListUserProjects(string userId)
-        {
-            ApplicationUser user = db.Users.Find(userId);
-
-            var projects = user.Projects.ToList();
-            return (projects);
-        }
 
         public void AddUserToProject(string userId, int projectId)
         {
@@ -81,7 +74,15 @@ namespace BugTracker.Helpers
 
         public ICollection<Project> ListProjectsForUser(string userId)
         {
+            ApplicationUser user = db.Users.Find(userId);
             var projects = new List<Project>();
+            return (projects);
+        }
+        public ICollection<Project>ListUserProjects(string userId)
+        {
+            ApplicationUser user = db.Users.Find(userId);
+
+            var projects = user.Projects.ToList();
             return (projects);
         }
 
@@ -103,6 +104,17 @@ namespace BugTracker.Helpers
                 }
             }
             return projectUsers;
+        }
+
+        public ICollection<Ticket> ListTicketsOnProject(int ticketId, int projectId)
+        {
+            var projects = new List<Project>();
+            return db.Projects.Find(projects).Tickets;
+        }
+
+        public ICollection<Ticket> TicketsOnProject(int projectId)
+        {            
+            return db.Projects.Find(projectId).Tickets.ToList();
         }
     }
 }

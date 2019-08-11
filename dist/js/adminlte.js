@@ -209,7 +209,8 @@ throw new Error('AdminLTE requires jQuery')
     $(this.element).removeClass(ClassName.collapsed);
 
     $(this.element)
-      .children(Selector.header + ', ' + Selector.body + ', ' + Selector.footer)
+      .children(Selector.header + ', ' + Selector
+          + ', ' + Selector.footer)
       .children(Selector.tools)
       .find('.' + expandIcon)
       .removeClass(expandIcon)

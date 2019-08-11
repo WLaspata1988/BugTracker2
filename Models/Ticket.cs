@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
 
@@ -12,7 +13,9 @@ namespace BugTracker.Models
         public int TicketTypeId { get; set; } //Describe the type of ticket it is
         public int TicketPriorityId { get; set; } //Categorize ticket as Low/Moderate/High priority
         public int TicketStatusId { get; set; } // Ticket Status Open/Closed/Delayed?
+        [StringLength(50, ErrorMessage = "Title must be between {2} and {1} characters long", MinimumLength = 5)]
         public string Title { get; set; } //Subject line/heading for ticket reason
+        [StringLength(200, ErrorMessage = "Description must be between {2} and {1} characters long", MinimumLength = 5)]
         public string Description { get; set; } //Detailed information of the issue or reason in full of why it was submitted
         public DateTime Created { get; set; }
         public DateTime? Updated { get; set; }
@@ -35,8 +38,11 @@ namespace BugTracker.Models
         public virtual ICollection<TicketHistory> TicketHistories { get; set; }
         public virtual ICollection<TicketNotification> TicketNotifications { get; set; }
 
+        public virtual ICollection<TicketPriority> TicketPriorities { get; set; }
+
         public Ticket()
         {
+            TicketPriorities = new HashSet<TicketPriority>();
             TicketComments = new HashSet<TicketComment>();
             TicketAttachments = new HashSet<TicketAttachment>();
             TicketHistories = new HashSet<TicketHistory>();

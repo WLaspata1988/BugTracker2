@@ -156,5 +156,11 @@ namespace BugTracker.Controllers
             projectHelper.RemoveUserFromProject(userId, projectId);
             return RedirectToAction("Details", "Projects", new { id = projectId });
         }
+
+        public ActionResult AddProjectUser(string userId, int projectId)
+        {
+            projectHelper.AddUserToProject(userId, projectId);
+            return RedirectToAction("Details", "Projects", new { id = projectId });
+        }
     } 
 }
